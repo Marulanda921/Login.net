@@ -1,0 +1,18 @@
+[
+  {
+    "ContainingType": "ApiLoginFull.Controllers.UserCredentialsController",
+    "Method": "CreateUser",
+    "RelativePath": "api/UserCredentials",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "user",
+        "Type": "ApiLoginFull.Model.UserCredentials",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
