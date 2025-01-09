@@ -1,15 +1,31 @@
 [
   {
     "ContainingType": "ApiLoginFull.Controllers.UserCredentialsController",
-    "Method": "CreateUser",
-    "RelativePath": "api/UserCredentials",
+    "Method": "Login",
+    "RelativePath": "api/UserCredentials/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "user",
-        "Type": "ApiLoginFull.Model.UserCredentials",
+        "Name": "request",
+        "Type": "ApiLoginFull.Utils.Dto.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ApiLoginFull.Controllers.UserCredentialsController",
+    "Method": "CreateUser",
+    "RelativePath": "api/UserCredentials/Register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ApiLoginFull.Utils.Dto.RegisterRequest",
         "IsRequired": true
       }
     ],

@@ -1,10 +1,10 @@
 ﻿using ApiLoginFull.Model;
 using ApiLoginFull.Services;
+using ApiLoginFull.Utils.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiLoginFull.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class UserCredentialsController : ControllerBase
@@ -20,20 +20,58 @@ namespace ApiLoginFull.Controllers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] UserCredentials user) {
-            if (user == null || string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Password)) {
-                return BadRequest("Datos invalidos");
-            }
+        [HttpPost("Register")]
+        public async Task<IActionResult> CreateUser([FromBody] RegisterRequest request) {
 
-            if (string.IsNullOrWhiteSpace(user.Email) || !IsValidEmail(user.Email) )
+            if (!ModelState.IsValid)
             {
-                return BadRequest("El correo electronico proporcionado no es valido");
+                return BadRequest(ModelState);
             }
 
-            await _userCredentialsService.CreateUserAsync(user);
-            return Ok("Usuario creado con exito");
+            if (!IsValidEmail(request.Email)) {
+                return BadRequest("Datos Invalidos");
+            }
+
+            try
+            {
+                var user = new UserCredentials
+                {
+                    Email = request.Email,
+                    Password = request.Password
+                };
+
+                await _userCredentialsService.CreateUserAsync(user);
+                return Ok(new { message = "Usuario creado con éxito" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error al crear el usuario: " + ex.Message);
+            }
+
         }
+
+        /// <summary>
+        /// Logear usuario
+        /// </summary>
+        /// <param name="credentials"></param>
+        /// <returns></returns>
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request) {
+            try
+            {
+                var response = await _userCredentialsService.LoginAsync(request.Email, request.Password);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized("Credenciales Invalidas");
+            }
+            catch (Exception ex) {
+                return StatusCode(500, "Error en el login" + ex.Message);
+            }
+        
+        }
+
 
         /// <summary>
         /// Funcion para validar el email

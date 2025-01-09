@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/UserCredentials": {
+    "/api/UserCredentials/Register": {
       "post": {
         "tags": [
           "UserCredentials"
@@ -14,17 +14,48 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentials"
+                "$ref": "#/components/schemas/RegisterRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentials"
+                "$ref": "#/components/schemas/RegisterRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCredentials"
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/UserCredentials/login": {
+      "post": {
+        "tags": [
+          "UserCredentials"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
@@ -39,39 +70,39 @@
   },
   "components": {
     "schemas": {
-      "ObjectId": {
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object",
         "properties": {
-          "timestamp": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
+          "email": {
+            "minLength": 1,
+            "type": "string"
           },
-          "creationTime": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true
+          "password": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "UserCredentials": {
+      "RegisterRequest": {
         "required": [
-          "email"
+          "email",
+          "password"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "$ref": "#/components/schemas/ObjectId"
-          },
           "email": {
             "minLength": 1,
             "type": "string",
             "format": "email"
           },
           "password": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false

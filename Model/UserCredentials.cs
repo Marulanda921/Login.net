@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ApiLoginFull.Model
 {
@@ -17,5 +18,9 @@ namespace ApiLoginFull.Model
 
         [BsonElement("password")]
         public string Password { get; set; }
+
+        [BsonElement("currentToken")]
+        [JsonIgnore]
+        public string? CurrentToken { get; set; }
     }
 }
