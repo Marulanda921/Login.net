@@ -18,15 +18,30 @@ namespace ApiLoginFull.Services
             var client = new MongoClient(mongoSettings["ConnectionString"]);
             var database = client.GetDatabase(mongoSettings["DatabaseName"]);
             _userCollection = database.GetCollection<UserCredentials>(mongoSettings["CollectionName"]);
-           
+            CreateUniqueEmailIndex();
+        }
+
+
+        private void CreateUniqueEmailIndex()
+        {
+            var indexKeysDefinition = Builders<UserCredentials>.IndexKeys.Ascending(user => user.Email);
+            var indexOptions = new CreateIndexOptions { Unique = true };
+            var indexModel = new CreateIndexModel<UserCredentials>(indexKeysDefinition, indexOptions);
+            _userCollection.Indexes.CreateOne(indexModel);
         }
 
         public async Task CreateUserAsync(UserCredentials user)
         {
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            //Generacion de Jwt
-            user.CurrentToken = _jwtService.GeneratedToken(ObjectId.GenerateNewId().ToString(), user.Email);
-            await _userCollection.InsertOneAsync(user);
+            //Verificar si el email ya existe
+            var existingUser = await _userCollection
+                .Find(x => x.Email == user.Email)
+                .FirstOrDefaultAsync();
+
+            if (existingUser != null)
+            {
+                throw new DuplicateEmailException($"El correo electrónico '{user.Email}' ya está registrado.");
+            }
+
         }
 
         public async Task<LoginResponse> LoginAsync(string email, string password) { 
@@ -49,6 +64,13 @@ namespace ApiLoginFull.Services
                 Token = user.CurrentToken,
                 Email = user.Email
             };
+        }
+
+        public class DuplicateEmailException : Exception
+        {
+            public DuplicateEmailException(string message) : base(message)
+            {
+            }
         }
     }
 }

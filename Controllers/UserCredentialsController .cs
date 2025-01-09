@@ -42,8 +42,8 @@ namespace ApiLoginFull.Controllers
 
                 await _userCredentialsService.CreateUserAsync(user);
                 return Ok(new { message = "Usuario creado con éxito" });
-            }
-            catch (Exception ex)
+              
+            }catch (Exception ex)
             {
                 return StatusCode(500, "Error al crear el usuario: " + ex.Message);
             }
