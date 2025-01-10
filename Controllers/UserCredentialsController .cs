@@ -64,7 +64,7 @@ namespace ApiLoginFull.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized("Credenciales Invalidas");
+                return Unauthorized("Credenciales Invalidas" + ex);
             }
             catch (Exception ex) {
                 return StatusCode(500, "Error en el login" + ex.Message);

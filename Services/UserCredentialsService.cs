@@ -42,6 +42,11 @@ namespace ApiLoginFull.Services
                 throw new DuplicateEmailException($"El correo electrónico '{user.Email}' ya está registrado.");
             }
 
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            user.CurrentToken = _jwtService.GeneratedToken(ObjectId.GenerateNewId().ToString(), user.Email);
+
+            await _userCollection.InsertOneAsync(user);
+
         }
 
         public async Task<LoginResponse> LoginAsync(string email, string password) { 
