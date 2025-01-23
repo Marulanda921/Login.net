@@ -7,26 +7,34 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 
-//QUITAR CORS DE TODOS LOS ORIGENES
+// Configuración de Kestrel para escuchar en múltiples puertos
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5000); // HTTP
+    serverOptions.ListenAnyIP(7051, listenOptions =>
+    {
+        listenOptions.UseHttps(); // HTTPS
+    });
+});
+
+// Configuración de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
     {
-        policy.AllowAnyOrigin()         // Permite solicitudes desde cualquier origen
-              .AllowAnyMethod()         // Permite cualquier método HTTP (GET, POST, etc.)
-              .AllowAnyHeader();        // Permite cualquier encabezado
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-
+// Configuración de JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-builder.Services.AddScoped <JwtService>();
+builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<UserCredentialsService>();
 
-
-//Configurar autenticacion de Jwt
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -47,18 +55,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCors("AllowAllOrigins");  // Asegúrate de usar la política de CORS aquí
+app.UseCors("AllowAllOrigins");
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -66,9 +69,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+
